@@ -16,20 +16,18 @@ import {getAccountingTheme} from '../theme';
 import ModeSwitch from '../components/ModeSwitch';
 import CategoryTabs from '../components/CategoryTabs';
 import NumberPad from '../components/NumberPad';
-
-interface RecordEntryScreenProps {
-  initialMode: RecordMode;
-  onClose: () => void;
-  onSubmit: (record: BillRecord, action: 'confirm' | 'again') => void;
-}
+import {useRecords} from '../RecordsContext';
+import {RecordEntryScreenProps} from '../navigation/types';
 
 const MAX_INTEGER_DIGITS = 8;
 
 export default function RecordEntryScreen({
-  initialMode,
-  onClose,
-  onSubmit,
+  navigation,
+  route,
 }: RecordEntryScreenProps) {
+  const {addRecord} = useRecords();
+  const initialMode = route.params.mode;
+
   const [mode, setMode] = useState<RecordMode>(initialMode);
   const categories = getCategoriesByMode(mode);
   const [selectedCategory, setSelectedCategory] = useState<CategoryOption>(
@@ -110,7 +108,8 @@ export default function RecordEntryScreen({
       Alert.alert('请输入金额', '记账金额需要大于 0');
       return;
     }
-    onSubmit(buildRecord(), 'confirm');
+    addRecord(buildRecord());
+    navigation.goBack();
   };
 
   const handleRecordAgain = () => {
@@ -118,7 +117,7 @@ export default function RecordEntryScreen({
       Alert.alert('请输入金额', '记账金额需要大于 0');
       return;
     }
-    onSubmit(buildRecord(), 'again');
+    addRecord(buildRecord());
     resetForNextEntry();
   };
 
@@ -129,8 +128,13 @@ export default function RecordEntryScreen({
         backgroundColor={theme.screenBg}
       />
       <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton} hitSlop={8}>
-          <Text style={[styles.closeLabel, {color: theme.textSecondary}]}>关闭</Text>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.closeButton}
+          hitSlop={8}>
+          <Text style={[styles.closeLabel, {color: theme.textSecondary}]}>
+            关闭
+          </Text>
         </TouchableOpacity>
         <ModeSwitch mode={mode} onChange={handleModeChange} />
         <View style={styles.headerSpacer} />
@@ -151,13 +155,20 @@ export default function RecordEntryScreen({
           {savedCount > 0 ? `  ·  本次已记 ${savedCount} 笔` : ''}
         </Text>
         <View style={styles.amountRow}>
-          <Text style={[styles.currencySymbol, {color: theme.textPrimary}]}>¥</Text>
-          <Text style={[styles.amountText, {color: theme.textPrimary}]} numberOfLines={1}>
+          <Text style={[styles.currencySymbol, {color: theme.textPrimary}]}>
+            ¥
+          </Text>
+          <Text
+            style={[styles.amountText, {color: theme.textPrimary}]}
+            numberOfLines={1}>
             {amount}
           </Text>
         </View>
         <TextInput
-          style={[styles.noteInput, {borderColor: theme.primaryLight, color: theme.textPrimary}]}
+          style={[
+            styles.noteInput,
+            {borderColor: theme.primaryLight, color: theme.textPrimary},
+          ]}
           placeholder="添加备注（选填）"
           placeholderTextColor={theme.textSecondary}
           value={note}

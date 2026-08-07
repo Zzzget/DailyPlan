@@ -13,23 +13,16 @@ import {BillFilter, BillRecord, RecordMode} from '../types';
 import {formatAmount, formatDate} from '../utils';
 import FilterTabs from '../components/FilterTabs';
 import BillListItem from '../components/BillListItem';
-
-interface BillListScreenProps {
-  records: BillRecord[];
-  onAddRecord: (mode: RecordMode) => void;
-  onRefresh: () => void;
-}
+import {useRecords} from '../RecordsContext';
+import {BillListScreenProps} from '../navigation/types';
 
 interface Section {
   title: string;
   data: BillRecord[];
 }
 
-export default function BillListScreen({
-  records,
-  onAddRecord,
-  onRefresh,
-}: BillListScreenProps) {
+export default function BillListScreen({navigation}: BillListScreenProps) {
+  const {records} = useRecords();
   const [filter, setFilter] = useState<BillFilter>('all');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -70,8 +63,11 @@ export default function BillListScreen({
 
   const handleRefresh = () => {
     setRefreshing(true);
-    onRefresh();
     setTimeout(() => setRefreshing(false), 500);
+  };
+
+  const handleAddRecord = (mode: RecordMode) => {
+    navigation.navigate('RecordEntry', {mode});
   };
 
   return (
@@ -123,15 +119,23 @@ export default function BillListScreen({
 
       <View style={styles.fabRow}>
         <TouchableOpacity
+          style={[styles.fab, styles.fabStats]}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('Stats')}
+          accessibilityRole="button"
+          accessibilityLabel="查看数据统计">
+          <Text style={styles.fabStatsLabel}>统计</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[styles.fab, styles.fabIncome]}
           activeOpacity={0.85}
-          onPress={() => onAddRecord('income')}>
+          onPress={() => handleAddRecord('income')}>
           <Text style={styles.fabLabel}>+ 收入</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.fab, styles.fabExpense]}
           activeOpacity={0.85}
-          onPress={() => onAddRecord('expense')}>
+          onPress={() => handleAddRecord('expense')}>
           <Text style={styles.fabLabel}>+ 支出</Text>
         </TouchableOpacity>
       </View>
@@ -225,8 +229,18 @@ const styles = StyleSheet.create({
   fabIncome: {
     backgroundColor: '#4FA8FF',
   },
+  fabStats: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#26262B',
+  },
   fabLabel: {
     color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  fabStatsLabel: {
+    color: '#26262B',
     fontSize: 14,
     fontWeight: '700',
   },
