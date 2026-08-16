@@ -9,10 +9,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {BillFilter, BillRecord, RecordMode} from '../types';
-import {formatAmount, formatDate} from '../utils';
+import {BillFilter, BillRecord, DateRange, RecordMode} from '../types';
+import {
+  formatAmount,
+  formatDate,
+  formatDayLabel,
+  formatDayShort,
+  isWithinDateRange,
+} from '../utils';
 import FilterTabs from '../components/FilterTabs';
 import BillListItem from '../components/BillListItem';
+import DateRangePickerModal from '../components/DateRangePickerModal';
 import {useRecords} from '../RecordsContext';
 import {BillListScreenProps} from '../navigation/types';
 
@@ -23,15 +30,31 @@ interface Section {
 
 export default function BillListScreen({navigation}: BillListScreenProps) {
   const {records} = useRecords();
+  /** 收支类型筛选：全部 / 仅支出 / 仅收入 */
   const [filter, setFilter] = useState<BillFilter>('all');
+  /** 下拉刷新进行中标记，仅用于展示刷新动效 */
   const [refreshing, setRefreshing] = useState(false);
+  /** 当前生效的日期范围筛选；null 表示不按日期过滤 */
+  const [dateRange, setDateRange] = useState<DateRange | null>(null);
+  /** 日期范围选择弹层是否可见 */
+  const [pickerVisible, setPickerVisible] = useState(false);
 
+  // 列表数据 = 全部账单先按收支类型过滤，再叠加日期范围过滤（闭区间，含结束日全天）
   const filteredRecords = useMemo(() => {
-    if (filter === 'all') {
-      return records;
-    }
-    return records.filter(record => record.mode === filter);
-  }, [records, filter]);
+    return records.filter(record => {
+      if (filter !== 'all' && record.mode !== filter) {
+        return false;
+      }
+      if (dateRange) {
+        return isWithinDateRange(
+          record.createdAt,
+          dateRange.start,
+          dateRange.end,
+        );
+      }
+      return true;
+    });
+  }, [records, filter, dateRange]);
 
   const totals = useMemo(() => {
     return filteredRecords.reduce(
@@ -93,8 +116,43 @@ export default function BillListScreen({navigation}: BillListScreenProps) {
       </View>
 
       <View style={styles.filterRow}>
-        <FilterTabs value={filter} onChange={setFilter} />
+        <View style={styles.filterTabsWrap}>
+          <FilterTabs value={filter} onChange={setFilter} />
+        </View>
+        <TouchableOpacity
+          style={[styles.calendarBtn, dateRange && styles.calendarBtnActive]}
+          activeOpacity={0.8}
+          onPress={() => setPickerVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel="选择日期范围">
+          <Text
+            style={[
+              styles.calendarBtnText,
+              dateRange && styles.calendarBtnTextActive,
+            ]}>
+            {dateRange
+              ? `📅 ${formatDayShort(dateRange.start)}-${formatDayShort(
+                  dateRange.end,
+                )}`
+              : '📅 日期'}
+          </Text>
+        </TouchableOpacity>
       </View>
+
+      {dateRange && (
+        <View style={styles.rangeHintBar}>
+          <Text style={styles.rangeHintText}>
+            已筛选 {formatDayLabel(dateRange.start)} ~{' '}
+            {formatDayLabel(dateRange.end)} 的账单
+          </Text>
+          <TouchableOpacity
+            onPress={() => setDateRange(null)}
+            accessibilityRole="button"
+            accessibilityLabel="清除日期筛选">
+            <Text style={styles.rangeClearText}>清除</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <SectionList
         sections={sections}
@@ -112,9 +170,23 @@ export default function BillListScreen({navigation}: BillListScreenProps) {
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>暂无账单，点击右下角开始记账</Text>
+            <Text style={styles.emptyText}>
+              {dateRange
+                ? '所选时间范围内暂无账单'
+                : '暂无账单，点击右下角开始记账'}
+            </Text>
           </View>
         }
+      />
+
+      <DateRangePickerModal
+        visible={pickerVisible}
+        value={dateRange}
+        onConfirm={range => {
+          setDateRange(range);
+          setPickerVisible(false);
+        }}
+        onClose={() => setPickerVisible(false)}
       />
 
       <View style={styles.fabRow}>
@@ -183,7 +255,55 @@ const styles = StyleSheet.create({
     color: '#2E86DE',
   },
   filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingBottom: 8,
+  },
+  filterTabsWrap: {
+    flex: 1,
+  },
+  calendarBtn: {
+    marginRight: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#DDDDE3',
+  },
+  calendarBtnActive: {
+    borderColor: '#26262B',
+    backgroundColor: '#26262B0D',
+  },
+  calendarBtnText: {
+    fontSize: 13,
+    color: '#8A8A93',
+    fontWeight: '600',
+  },
+  calendarBtnTextActive: {
+    color: '#26262B',
+    fontWeight: '700',
+  },
+  rangeHintBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#F7F7FA',
+  },
+  rangeHintText: {
+    fontSize: 12,
+    color: '#4B4B52',
+    fontWeight: '600',
+  },
+  rangeClearText: {
+    fontSize: 12,
+    color: '#9A9AA3',
+    fontWeight: '600',
+    paddingLeft: 12,
   },
   listContent: {
     paddingBottom: 100,
