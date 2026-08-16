@@ -2,7 +2,6 @@ import React, {useMemo, useState} from 'react';
 import {
   Alert,
   Platform,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {BillRecord, CategoryOption, RecordMode} from '../types';
 import {getCategoriesByMode} from '../categories';
 import {getAccountingTheme} from '../theme';

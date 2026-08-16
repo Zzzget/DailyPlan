@@ -1,6 +1,5 @@
 import React, {useMemo} from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -8,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {LineChart, PieChart} from 'react-native-gifted-charts';
 import {useRecords} from '../RecordsContext';
 import {StatsScreenProps} from '../navigation/types';

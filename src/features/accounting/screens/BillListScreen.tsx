@@ -1,7 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {
   RefreshControl,
-  SafeAreaView,
   SectionList,
   StatusBar,
   StyleSheet,
@@ -17,6 +16,7 @@ import {
   formatDayShort,
   isWithinDateRange,
 } from '../utils';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import FilterTabs from '../components/FilterTabs';
 import BillListItem from '../components/BillListItem';
 import DateRangePickerModal from '../components/DateRangePickerModal';
