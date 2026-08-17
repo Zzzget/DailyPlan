@@ -5,10 +5,18 @@
  */
 
 import React from 'react';
-import AccountingApp from './src/features/accounting/AccountingApp';
+import {NavigationContainer} from '@react-navigation/native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import RootTabs from './src/navigation/RootTabs';
 
 function App(): React.JSX.Element {
-  return <AccountingApp />;
+  return (
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <RootTabs />
+      </NavigationContainer>
+    </SafeAreaProvider>
+  );
 }
 
 export default App;
