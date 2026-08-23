@@ -5,6 +5,7 @@ import {RootTabParamList} from './types';
 import DailyPlanScreen from '../features/plan/screens/DailyPlanScreen';
 import TimeReviewScreen from '../features/review/screens/TimeReviewScreen';
 import AccountingApp from '../features/accounting/AccountingApp';
+import ProfileScreen from '../features/profile/screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -86,7 +87,22 @@ function BillIcon({color, size}: TabIconProps) {
   );
 }
 
-/** 根底部 Tab 导航：计划 - 记录 - 账单 */
+/** 我的 Tab 图标：人像 */
+function ProfileIcon({color, size}: TabIconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={8} r={4} stroke={color} strokeWidth={1.8} />
+      <Path
+        d="M5 20c1-3.8 3.8-5.5 7-5.5s6 1.7 7 5.5"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+/** 根底部 Tab 导航：计划 - 记录 - 账单 - 我的 */
 export default function RootTabs() {
   return (
     <Tab.Navigator
@@ -119,6 +135,16 @@ export default function RootTabs() {
         options={{
           title: '账单',
           tabBarIcon: ({color, size}) => <BillIcon color={color} size={size} />,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: '我的',
+          tabBarIcon: ({color, size}) => (
+            <ProfileIcon color={color} size={size} />
+          ),
         }}
       />
     </Tab.Navigator>

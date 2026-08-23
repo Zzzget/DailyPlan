@@ -1,0 +1,174 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {"200": {"description": ""}},
+        "tags": ["App"]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {"200": {"description": ""}},
+        "tags": ["users"]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/RegisterDto"}
+            }
+          }
+        },
+        "responses": {"201": {"description": ""}},
+        "tags": ["auth"]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/LoginDto"}
+            }
+          }
+        },
+        "responses": {"201": {"description": ""}},
+        "tags": ["auth"]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {"200": {"description": ""}},
+        "security": [{"bearer": []}],
+        "tags": ["auth"]
+      }
+    },
+    "/bills/create": {
+      "post": {
+        "operationId": "BillController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CreateBillDto"}
+            }
+          }
+        },
+        "responses": {"201": {"description": ""}},
+        "security": [{"bearer": []}],
+        "tags": ["bills"]
+      }
+    },
+    "/bills/get": {
+      "get": {
+        "operationId": "BillController_find",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "账单类型",
+            "schema": {"type": "string", "enum": ["income", "expense"]}
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "分类",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "开始日期，格式 YYYY-MM-DD",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "结束日期，格式 YYYY-MM-DD",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {"200": {"description": ""}},
+        "security": [{"bearer": []}],
+        "tags": ["bills"]
+      }
+    }
+  },
+  "info": {
+    "title": "Daily Plan API",
+    "description": "每日计划服务接口文档",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {"scheme": "bearer", "bearerFormat": "JWT", "type": "http"}
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {"type": "string"},
+          "password": {"type": "string"},
+          "nickname": {"type": "string"}
+        },
+        "required": ["email", "password", "nickname"]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {"type": "string"},
+          "password": {"type": "string"}
+        },
+        "required": ["email", "password"]
+      },
+      "CreateBillDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["income", "expense"],
+            "description": "账单类型"
+          },
+          "amount": {"type": "number", "description": "金额"},
+          "category": {"type": "string", "description": "分类"},
+          "recordDate": {
+            "type": "string",
+            "description": "记账日期，格式 YYYY-MM-DD"
+          },
+          "note": {"type": "string", "description": "备注"}
+        },
+        "required": ["type", "amount", "category", "recordDate"]
+      }
+    }
+  }
+}

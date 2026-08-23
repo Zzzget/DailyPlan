@@ -9,4 +9,6 @@ export type RootTabParamList = {
   Record: undefined;
   /** 账单 Tab：内嵌记账模块的栈导航 */
   Bill: NavigatorScreenParams<AccountingStackParamList>;
+  /** 我的 Tab：个人中心页 */
+  Profile: undefined;
 };
