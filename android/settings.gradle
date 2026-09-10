@@ -3,8 +3,19 @@ pluginManagement {
 }
 
 plugins { id("com.facebook.react.settings") }
+
 extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
 rootProject.name = 'DailyPlan'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
+def addRepositoryMirrors = { repositories ->
+    repositories.maven { url = uri('https://maven.aliyun.com/repository/gradle-plugin') }
+    repositories.maven { url = uri('https://maven.aliyun.com/repository/google') }
+    repositories.maven { url = uri('https://maven.aliyun.com/repository/central') }
+}
+
+gradle.beforeProject { project ->
+    addRepositoryMirrors(project.buildscript.repositories)
+    addRepositoryMirrors(project.repositories)
+}
