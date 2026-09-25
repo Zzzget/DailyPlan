@@ -95,7 +95,7 @@ export default function BillListScreen({navigation}: BillListScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" />
 
       <View style={styles.header}>
         <Text style={styles.title}>账单</Text>

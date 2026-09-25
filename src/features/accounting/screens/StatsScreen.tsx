@@ -153,7 +153,7 @@ export default function StatsScreen({navigation}: StatsScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
+      <StatusBar barStyle="dark-content" />
 
       <View style={styles.navBar}>
         <TouchableOpacity

@@ -123,10 +123,7 @@ export default function RecordEntryScreen({
 
   return (
     <SafeAreaView style={[styles.safeArea, {backgroundColor: theme.screenBg}]}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.screenBg}
-      />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
